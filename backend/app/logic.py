@@ -1,6 +1,13 @@
 from __future__ import annotations
 
+import os
+
 import numpy as np
+
+# Use the NVIDIA cuda-python binding instead of Numba's ctypes wrapper.
+# This avoids the cuCtxSynchronize_v2 context-destroyed error (709) on
+# CUDA 13.0+ drivers.
+os.environ.setdefault("NUMBA_CUDA_USE_NVIDIA_BINDING", "1")
 
 try:
     from numba import cuda

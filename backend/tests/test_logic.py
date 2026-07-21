@@ -29,7 +29,7 @@ def test_compute_next_generation_returns_valid_mode() -> None:
     grid[1, 0:3] = 1
 
     next_grid, mode_used = compute_next_generation(grid, mode="gpu")
-
+    print(f"mode_used: {mode_used}")
     assert mode_used in {"gpu", "cpu"}
     assert next_grid.shape == grid.shape
 
