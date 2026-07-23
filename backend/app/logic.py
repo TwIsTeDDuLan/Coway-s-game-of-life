@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import warnings
 
 import numpy as np
 
@@ -11,6 +12,8 @@ os.environ.setdefault("NUMBA_CUDA_USE_NVIDIA_BINDING", "1")
 
 try:
     from numba import cuda
+    from numba.core.errors import NumbaPerformanceWarning
+    warnings.filterwarnings("ignore", category=NumbaPerformanceWarning)
 
     CUDA_AVAILABLE = bool(cuda.is_available())
 except Exception:  # pragma: no cover
