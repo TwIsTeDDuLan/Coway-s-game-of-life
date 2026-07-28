@@ -212,7 +212,8 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot(np.ndarray, float, float, int, str)
     def on_benchmark_done(self, next_grid, total_ms, avg_ms, steps, mode_used):
-        self.renderer.set_grid(next_grid)
+        if self.controls.check_render_bench.isChecked():
+            self.renderer.set_grid(next_grid)
         self.generation += steps
         self.label_status_gen.setText(f"Gen: {self.generation}")
         res = f"Benchmark ({mode_used.upper()}, {steps} steps): total {total_ms:.1f} ms, avg {avg_ms:.3f} ms/step"
@@ -257,7 +258,10 @@ class MainWindow(QMainWindow):
                 QMessageBox.critical(self, "Parse Error", f"Failed to parse RLE:\n{str(e)}")
                 return
                 
-        self.renderer.set_grid(grid)
+        if self.controls.check_render_bench.isChecked():
+            self.renderer.set_grid(grid)
+        else:
+            self.renderer.grid = grid
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space:

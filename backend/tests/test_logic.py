@@ -1,13 +1,13 @@
 import numpy as np
 
-from app.logic import CUDA_AVAILABLE, compute_next_generation, next_generation_cpu
+from app.logic import CUDA_AVAILABLE, compute_next_generation, next_generation_numpy
 
 
 def test_block_still_life_stays_stable() -> None:
     grid = np.zeros((4, 4), dtype=np.uint8)
     grid[1:3, 1:3] = 1
 
-    next_grid = next_generation_cpu(grid)
+    next_grid = next_generation_numpy(grid)
 
     np.testing.assert_array_equal(next_grid, grid)
 
@@ -19,7 +19,7 @@ def test_blinker_oscillator_flips_axis() -> None:
     expected = np.zeros((5, 5), dtype=np.uint8)
     expected[1:4, 2] = 1
 
-    next_grid = next_generation_cpu(grid)
+    next_grid = next_generation_numpy(grid)
 
     np.testing.assert_array_equal(next_grid, expected)
 

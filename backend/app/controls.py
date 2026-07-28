@@ -1,7 +1,7 @@
 from PyQt5.QtCore import Qt, pyqtSignal
 from PyQt5.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel,
-    QSpinBox, QSlider, QComboBox, QPlainTextEdit, QDockWidget
+    QSpinBox, QSlider, QComboBox, QPlainTextEdit, QDockWidget, QCheckBox
 )
 
 from app.patterns import PATTERN_LIBRARY, PATTERN_CATEGORIES
@@ -53,7 +53,14 @@ class ControlsDock(QDockWidget):
         
         mode_lay = QHBoxLayout()
         self.combo_mode = QComboBox()
-        self.combo_mode.addItems(["CPU (NumPy)", "GPU (CUDA)"])
+        self.combo_mode.addItem("CPU (NumPy)", "numpy")
+        self.combo_mode.addItem("CPU (SciPy Convolution)", "scipy")
+        self.combo_mode.addItem("CPU (Native Loop)", "loop")
+        self.combo_mode.addItem("CPU (Numba Multicore)", "numba")
+        self.combo_mode.addItem("CPU (Numba Fast Branching)", "numba_fast")
+        self.combo_mode.addItem("CPU (Numba Optimized)", "numba_opt")
+        self.combo_mode.addItem("GPU (CUDA)", "gpu")
+        self.combo_mode.addItem("GPU (CUDA Optimized)", "gpu_opt")
         mode_lay.addWidget(QLabel("Mode:")); mode_lay.addWidget(self.combo_mode)
         sim_layout.addLayout(mode_lay)
         
@@ -86,6 +93,11 @@ class ControlsDock(QDockWidget):
         btn_bench.clicked.connect(lambda: self.benchmark_requested.emit(self.spin_bench.value()))
         b_lay.addWidget(QLabel("Steps:")); b_lay.addWidget(self.spin_bench); b_lay.addWidget(btn_bench)
         bench_layout.addLayout(b_lay)
+        
+        self.check_render_bench = QCheckBox("Render result (Benchmark / Load)")
+        self.check_render_bench.setChecked(True)
+        bench_layout.addWidget(self.check_render_bench)
+        
         self.label_bench_res = QLabel("")
         self.label_bench_res.setWordWrap(True)
         bench_layout.addWidget(self.label_bench_res)
@@ -166,7 +178,7 @@ class ControlsDock(QDockWidget):
         self.pattern_load_requested.emit(val or "", mode, density, custom_rle)
 
     def get_current_mode(self):
-        return "gpu" if self.combo_mode.currentIndex() == 1 else "cpu"
+        return self.combo_mode.currentData()
         
     def get_speed(self):
         return self.slider_speed.value()

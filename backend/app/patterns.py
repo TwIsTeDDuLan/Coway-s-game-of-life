@@ -112,11 +112,22 @@ def random_fill(grid: np.ndarray, density: float = 0.3) -> np.ndarray:
     """
     Fill a grid with random alive/dead cells.
     Mutates and returns the grid.
+    
+    Uses a chunked approach to avoid allocating a single massive temporary
+    array (e.g. np.random.rand on a 40K×40K grid would create a 12 GB float64 array).
     """
-    grid_rows, grid_cols = grid.shape
-    random_cells = (np.random.rand(grid_rows, grid_cols) < density).astype(np.uint8)
-    # Using np.copyto avoids creating a new array object, mutating in-place
-    np.copyto(grid, random_cells)
+    rows, cols = grid.shape
+    threshold = int(density * 256)  # Map density to 0-255 range
+    
+    # Process in chunks of rows to keep peak memory low
+    chunk_size = max(1, min(1000, rows))
+    for start in range(0, rows, chunk_size):
+        end = min(start + chunk_size, rows)
+        # randint with dtype=np.uint8 uses 1 byte/cell instead of 8
+        grid[start:end, :] = (
+            np.random.randint(0, 256, size=(end - start, cols), dtype=np.uint8) < threshold
+        ).astype(np.uint8)
+    
     return grid
 
 
